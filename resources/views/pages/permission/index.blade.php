@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Users')
+@section('title', 'Permission')
 
 @section('head')
 <link href="assets/theme/plugins/datatable/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
@@ -37,7 +37,7 @@
             </nav>
         </div>
         <div class="ms-auto">
-            <a href="{{ route('users.form') }}" class="btn btn-sm btn-primary"><i class="lni lni-circle-plus" style="margin-top: -16px;"></i> User Baru</a>
+            <a href="{{ route('permission.form') }}" class="btn btn-sm btn-primary"><i class="lni lni-circle-plus" style="margin-top: -16px;"></i> Create Permission</a>
 
         </div>
     </div>
@@ -50,11 +50,11 @@
                 <div class="card-body">
                     <div class="d-flex align-items-center">
                         <div class="">
-                            <p class="mb-1">Total Users</p>
-                            <h4 class="mb-0">{{ $user_count }}</h4>
+                            <p class="mb-1">Total Permission</p>
+                            <h4 class="mb-0">{{ $permission_count }}</h4>
                         </div>
                         <div class="ms-auto widget-icon bg-info text-white">
-                            <i class="bi bi-people-fill"></i>
+                            <i class="bi bi-person-lines-fill"></i>
                         </div>
                     </div>
                 </div>
@@ -92,7 +92,7 @@
         processing: true,
         serverSide: true,
         ajax: {
-            url: "{{ route('users.get') }}",
+            url: "{{ route('permission.get') }}",
             type: "GET",
         },
         columns: [{
@@ -104,24 +104,20 @@
             className: 'text-center',
             width: '75px',
         }, {
-            title: 'Name',
+            title: 'Permission Name',
             data: 'name',
-        }, {
-            title: 'Email',
-            data: 'email',
-        }, {
-            title: 'Entitas',
-            data: 'entity',
-        }, {
-            title: 'Role',
-            data: 'role',
+            width: '35%',
+        }, { 
+            title: 'Guard Name',
+            data: 'guard_name',
+            width: '35%',
         }, {
             title: 'Aksi',
             data: 'id',
             orderable: false,
             searchable: false,
-            width: '1px',
-            className: 'no-wrap',
+            width: '20%',
+            className: 'no-wrap text-center',
             render: (data, type, row, meta) => {
                 let html = "";
                 $.each(row.buttons, function(i, item) {
@@ -130,7 +126,7 @@
                         attribute += `${value.name}="${value.text}"`;
                     });
                     html +=
-                        `<a href="${item.url}" class="btn ${item.className}" ${attribute} data-toggle="tooltip" title="${item.text}" data-placement="left"><i class="${item.fontawesome}"></i></a>`;
+                        `<a href="${item.url}" class="btn ${item.className} mr-1" ${attribute} data-toggle="tooltip" title="${item.text}" data-placement="left"><i class="${item.fontawesome}"></i></a>`;
                 })
                 return html;
             }

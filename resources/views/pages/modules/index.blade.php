@@ -1,8 +1,8 @@
 @extends('layouts.app')
-@section('title', 'Users')
+@section('title', 'Module')
 
 @section('head')
-<link href="assets/theme/plugins/datatable/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
+<link href="{{ url('') }}/assets/theme/plugins/datatable/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
 
 @endsection
 
@@ -37,7 +37,7 @@
             </nav>
         </div>
         <div class="ms-auto">
-            <a href="{{ route('users.form') }}" class="btn btn-sm btn-primary"><i class="lni lni-circle-plus" style="margin-top: -16px;"></i> User Baru</a>
+            <a href="{{ route('module.form') }}" class="btn btn-sm btn-primary"><i class="lni lni-circle-plus" style="margin-top: -16px;"></i> Modul Baru</a>
 
         </div>
     </div>
@@ -50,11 +50,11 @@
                 <div class="card-body">
                     <div class="d-flex align-items-center">
                         <div class="">
-                            <p class="mb-1">Total Users</p>
-                            <h4 class="mb-0">{{ $user_count }}</h4>
+                            <p class="mb-1">Total Module</p>
+                            <h4 class="mb-0">{{ $module_total }}</h4>
                         </div>
                         <div class="ms-auto widget-icon bg-info text-white">
-                            <i class="bi bi-people-fill"></i>
+                            <i class="bx bx-git-branch"></i>
                         </div>
                     </div>
                 </div>
@@ -78,8 +78,8 @@
 @endsection
 
 @section('script')
-<script src="assets/theme/plugins/datatable/js/jquery.dataTables.min.js"></script>
-<script src="assets/theme/plugins/datatable/js/dataTables.bootstrap5.min.js"></script>
+<script src="{{ url('') }}/assets/theme/plugins/datatable/js/jquery.dataTables.min.js"></script>
+<script src="{{ url('') }}/assets/theme/plugins/datatable/js/dataTables.bootstrap5.min.js"></script>
 <script>
     var main_table = $('#main-table').DataTable({
         aLengthMenu: [
@@ -92,7 +92,7 @@
         processing: true,
         serverSide: true,
         ajax: {
-            url: "{{ route('users.get') }}",
+            url: "{{ route('module.get') }}",
             type: "GET",
         },
         columns: [{
@@ -107,14 +107,12 @@
             title: 'Name',
             data: 'name',
         }, {
-            title: 'Email',
-            data: 'email',
+            title: 'Client ID',
+            data: 'id',
         }, {
-            title: 'Entitas',
-            data: 'entity',
-        }, {
-            title: 'Role',
-            data: 'role',
+            title: 'Secret',
+            data: 'secret',
+            className: 'text-center',
         }, {
             title: 'Aksi',
             data: 'id',
@@ -141,6 +139,7 @@
     });
 
     $(document).ready(function() {
+        // $('#example').DataTable();
 
     });
 </script>
