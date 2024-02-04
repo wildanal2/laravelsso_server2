@@ -42,7 +42,7 @@
     <div class="col-xl-12 mx-auto">
         <div class="card">
             <div class="card-body">
-                <form action="{{ url('account/change-password') }}" method="post">
+                <form action="" method="post" id="form-main">
                     <div class="border p-4 rounded">
                         <div class="card-title d-flex align-items-center">
                             <h5 class="mb-0">User {{ ($user ? 'Update':'Registration') }}</h5>
@@ -50,10 +50,10 @@
                         <hr />
                         {{ csrf_field() }}
                         <div class="row mb-3">
-                            <label for="nama" class="col-sm-3 col-form-label">Enter Name</label>
+                            <label for="name" class="col-sm-3 col-form-label">Enter Name</label>
                             <div class="col-sm-9">
-                                <input type="text" class="form-control @error('nama') is-invalid @enderror" id="nama" name="nama" value="{{ old('name') }}" placeholder="Enter Name for user" autocomplete="nama">
-                                @error('nama')
+                                <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name', $user->name ?? '') }}" placeholder="Enter Name for user" autocomplete="name">
+                                @error('name')
                                 <span class="text-danger">{{ $message}}</span>
                                 @enderror
                             </div>
@@ -61,25 +61,59 @@
                         <div class="row mb-3">
                             <label for="email" class="col-sm-3 col-form-label">Email Address</label>
                             <div class="col-sm-9">
-                                <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email" value="{{ old('email') }}" placeholder="Email Address" autocomplete="new-email">
+                                <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email" value="{{ old('email', $user->email ?? '') }}" placeholder="Email Address" autocomplete="new-email">
                                 @error('email')
                                 <span class="text-danger">{{ $message}}</span>
                                 @enderror
                             </div>
                         </div>
                         <div class="row mb-3">
-                            <label for="new-password" class="col-sm-3 col-form-label">Choose Password</label>
+                            <label for="entity" class="col-sm-3 col-form-label">Entity</label>
                             <div class="col-sm-9">
-                                <input type="password" class="form-control @error('new-password') is-invalid @enderror" id="new-password" name="new-password" placeholder="Choose Password" autocomplete="new-password">
-                                @error('new-password')
+                                <select class="form-control select2-entity @error('entity') is-invalid @enderror" name="entity[]" multiple="multiple" data-placeholder="Select Entity">
+                                    @foreach ($user->hasEntities ??[] as $item)
+                                    <option value="{{ $item->id }}" selected>{{ $item->name }}</option>
+                                    @endforeach
+                                </select>
+                                @error('entity')
                                 <span class="text-danger">{{ $message}}</span>
                                 @enderror
                             </div>
                         </div>
                         <div class="row mb-3">
+                            <label for="role" class="col-sm-3 col-form-label">Role</label>
+                            <div class="col-sm-9">
+                                <select class="form-control select2-role @error('role') is-invalid @enderror" name="role[]" multiple="multiple" data-placeholder="Select Role">
+                                    @foreach ($role ??[] as $item)
+                                    <option value="{{ $item->id }}" {{ $user?->roles?->pluck('id')->contains($item->id)? 'selected':'' }}>{{ $item->name }}</option>
+                                    @endforeach
+                                </select>
+                                @error('role')
+                                <span class="text-danger">{{ $message}}</span>
+                                @enderror
+                            </div>
+                        </div>
+                        @if (isset($user))
+                        <div class="row mb-3">
+                            <label class="col-sm-3 col-form-label">Reset Password</label>
+                            <div class="col-sm-9 d-flex align-items-center">
+                                <input class="form-check-input" type="checkbox" value="" id="reset-pass">
+                            </div>
+                        </div>
+                        @endif
+                        <div class="row mb-3 reset-pass {{ isset($user)? 'd-none':'' }}">
+                            <label for="new-password" class="col-sm-3 col-form-label">Choose Password</label>
+                            <div class="col-sm-9">
+                                <input type="password" class="form-control @error('new-password') is-invalid @enderror" id="new-password" name="new-password" placeholder="Choose New Password" autocomplete="new-password">
+                                @error('new-password')
+                                <span class="text-danger">{{ $message}}</span>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="row mb-3 reset-pass {{ isset($user)? 'd-none':'' }}">
                             <label for="re-password" class="col-sm-3 col-form-label">Confirm Password</label>
                             <div class="col-sm-9">
-                                <input type="password" class="form-control @error('re-password') is-invalid @enderror" id="re-password" name="re-password" placeholder="Confirm Password">
+                                <input type="password" class="form-control @error('re-password') is-invalid @enderror" id="re-password" name="re-password" placeholder="Confirm New Password">
                                 @error('re-password')
                                 <span class="text-danger">{{ $message}}</span>
                                 @enderror
@@ -88,7 +122,15 @@
                         <div class="row">
                             <label class="col-sm-3 col-form-label"></label>
                             <div class="col-sm-9">
-                                <button type="submit" class="btn btn-primary px-5">Register</button>
+                                <button type="submit" class="btn btn-primary px-5">{{ ($user ? 'Update':'Registration') }}</button>
+                                @if ($user && $user->is_active !=0)
+                                <button type="button" class="btn btn-warning mx-3" id="btn-suspend-user">
+                                    <i class="fadeIn animated bx bx-user-x" style="margin-top: -20px;"></i>Suspend</button>
+                                @endif
+                                @if ($user && $user->is_active ==0)
+                                <button type="button" class="btn btn-success mx-3" id="btn-active-user">
+                                    <i class="fadeIn animated bx bx-user-check" style="margin-top: -20px; padding-right: 5px;"></i>Set Active</button>
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -102,9 +144,59 @@
 
 @section('script')
 <script>
+    $('.select2-entity').select2({
+        ajax: {
+            url: "{{ route('select2.get-entity') }}",
+            data: function(item) {
+                return {
+                    term: item.term,
+                    page: item.page,
+                }
+            },
+            dataType: 'json',
+            processResults: function(data, params) {
+                params.page = params.page || 1;
+                return data;
+            },
+            cache: true
+        },
+        allowClear: true,
+        escapeMarkup: function(markup) {
+            return markup;
+        },
+    });
+
+    function addNewInput(val) {
+        var newInput = $('<input>').attr({
+            type: 'hidden',
+            name: 'is_active',
+            value: val
+        });
+        // Append the new input to the container
+        $('#form-main').append(newInput);
+    }
+
     $(document).ready(function() {
+        // 
+        $('.select2-role').select2();
 
+        $('#reset-pass').change(function() {
+            var isChecked = $(this).prop('checked');
+            if (isChecked) {
+                $('.reset-pass').removeClass('d-none');
+            } else {
+                $('.reset-pass').addClass('d-none');
+            }
+        });
 
+        $('#btn-suspend-user').on('click', function() {
+            addNewInput(0);
+            $('#form-main').submit();
+        });
+        $('#btn-active-user').on('click', function() {
+            addNewInput(1);
+            $('#form-main').submit();
+        });
     });
 </script>
 @endsection

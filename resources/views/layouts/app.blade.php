@@ -13,21 +13,20 @@
         {{ config('app.name', 'Laravel') }}
     </title>
 
-    <!-- Scripts -->
-
     <!--plugins-->
     <link rel="stylesheet" href="{{ url('') }}/assets/theme/plugins/notifications/css/lobibox.min.css" />
     <link href="{{ url('') }}/assets/theme/plugins/simplebar/css/simplebar.css" rel="stylesheet" />
     <link href="{{ url('') }}/assets/theme/plugins/perfect-scrollbar/css/perfect-scrollbar.css" rel="stylesheet" />
     <link href="{{ url('') }}/assets/theme/plugins/metismenu/css/metisMenu.min.css" rel="stylesheet" />
-    <!-- Bootstrap CSS -->
+    <!-- Scripts --> 
+    @vite(['resources/sass/app.scss', 'resources/js/app.js'])
     <link href="{{ url('') }}/assets/theme/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Bootstrap CSS -->
     <link href="{{ url('') }}/assets/theme/css/bootstrap-extended.css" rel="stylesheet" />
     <link href="{{ url('') }}/assets/theme/css/style.css" rel="stylesheet" />
     <link href="{{ url('') }}/assets/theme/css/icons.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
-
 
     <!-- loader-->
     <link href="{{ url('') }}/assets/theme/css/pace.min.css" rel="stylesheet" />
@@ -37,6 +36,8 @@
     <link href="{{ url('') }}/assets/theme/css/light-theme.css" rel="stylesheet" />
     <link href="{{ url('') }}/assets/theme/css/semi-dark.css" rel="stylesheet" />
     <link href="{{ url('') }}/assets/theme/css/header-colors.css" rel="stylesheet" />
+    
+
     @yield('head')
 </head>
 
@@ -74,7 +75,7 @@
 
 
     <!-- Bootstrap bundle JS -->
-    <script src="{{ url('') }}/assets/theme/js/bootstrap.bundle.min.js"></script>
+    {{-- <script src="{{ url('') }}/assets/theme/js/bootstrap.bundle.min.js"></script> --}}
     <!--plugins-->
     <script src="{{ url('') }}/assets/theme/js/jquery.min.js"></script>
     <script src="{{ url('') }}/assets/theme/plugins/simplebar/js/simplebar.min.js"></script>
@@ -87,6 +88,8 @@
     <!--app-->
     <script src="{{ url('') }}/assets/theme/js/app.js"></script>
     <script src="{{ url('') }}/assets/theme/js/index.js"></script>
+    <script src="{{ asset('assets/theme/js/select2.full.min.js') }}"></script>
+
     @yield('script')
     @if (!empty(session('message')))
     <script>

@@ -37,7 +37,7 @@
             </nav>
         </div>
         <div class="ms-auto">
-            <a href="{{ route('module.form') }}" class="btn btn-sm btn-primary"><i class="lni lni-circle-plus" style="margin-top: -16px;"></i> Modul Baru</a>
+            <a href="{{ route('module.form') }}" class="btn btn-sm btn-primary"><i class="lni lni-circle-plus" style="margin-top: -16px;"></i> New Module</a>
 
         </div>
     </div>
@@ -54,7 +54,7 @@
                             <h4 class="mb-0">{{ $module_total }}</h4>
                         </div>
                         <div class="ms-auto widget-icon bg-info text-white">
-                            <i class="bx bx-git-branch"></i>
+                            <i class="bx bx-vector"></i>
                         </div>
                     </div>
                 </div>
@@ -81,65 +81,66 @@
 <script src="{{ url('') }}/assets/theme/plugins/datatable/js/jquery.dataTables.min.js"></script>
 <script src="{{ url('') }}/assets/theme/plugins/datatable/js/dataTables.bootstrap5.min.js"></script>
 <script>
-    var main_table = $('#main-table').DataTable({
-        aLengthMenu: [
-            [10, 25, 50, 100, -1],
-            [10, 25, 50, 100, "All"]
-        ],
-        iDisplayLength: 10,
-        scrollX: true,
-        scrollCollapse: true,
-        processing: true,
-        serverSide: true,
-        ajax: {
-            url: "{{ route('module.get') }}",
-            type: "GET",
-        },
-        columns: [{
-            title: '#',
-            data: 'id',
-            render: (data, type, row, meta) => {
-                return meta.row + meta.settings._iDisplayStart + 1;
-            },
-            className: 'text-center',
-            width: '75px',
-        }, {
-            title: 'Name',
-            data: 'name',
-        }, {
-            title: 'Client ID',
-            data: 'id',
-        }, {
-            title: 'Secret',
-            data: 'secret',
-            className: 'text-center',
-        }, {
-            title: 'Aksi',
-            data: 'id',
-            orderable: false,
-            searchable: false,
-            width: '1px',
-            className: 'no-wrap',
-            render: (data, type, row, meta) => {
-                let html = "";
-                $.each(row.buttons, function(i, item) {
-                    let attribute = '';
-                    $.each(item.attribute, function(key, value) {
-                        attribute += `${value.name}="${value.text}"`;
-                    });
-                    html +=
-                        `<a href="${item.url}" class="btn ${item.className}" ${attribute} data-toggle="tooltip" title="${item.text}" data-placement="left"><i class="${item.fontawesome}"></i></a>`;
-                })
-                return html;
-            }
-        }],
-        "fnDrawCallback": function() {
-            $('[data-toggle="tooltip"]').tooltip();
-        }
-    });
-
     $(document).ready(function() {
-        // $('#example').DataTable();
+        var main_table = $('#main-table').DataTable({
+            aLengthMenu: [
+                [10, 25, 50, 100, -1],
+                [10, 25, 50, 100, "All"]
+            ],
+            iDisplayLength: 10,
+            scrollX: true,
+            scrollCollapse: true,
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: "{{ route('module.get') }}",
+                type: "GET",
+            },
+            columns: [{
+                title: '#',
+                data: 'id',
+                render: (data, type, row, meta) => {
+                    return meta.row + meta.settings._iDisplayStart + 1;
+                },
+                className: 'text-center',
+                width: '75px',
+            }, {
+                title: 'Code Name',
+                data: 'codename',
+            }, {
+                title: 'Name',
+                data: 'name',
+            }, {
+                title: 'Description',
+                data: 'description',
+            }, {
+                title: 'Version',
+                data: 'last_version',
+                className: 'text-center',
+            }, {
+                title: 'Aksi',
+                data: 'id',
+                orderable: false,
+                searchable: false,
+                width: '1px',
+                className: 'no-wrap',
+                render: (data, type, row, meta) => {
+                    let html = "";
+                    $.each(row.buttons, function(i, item) {
+                        let attribute = '';
+                        $.each(item.attribute, function(key, value) {
+                            attribute += `${value.name}="${value.text}"`;
+                        });
+                        html +=
+                            `<a href="${item.url}" class="btn btn-sm ${item.className} mx-1" ${attribute} data-toggle="tooltip" title="${item.text}" data-placement="left"><i class="${item.fontawesome}" style="margin-left:-1px"></i></a>`;
+                    })
+                    return html;
+                }
+            }],
+            "fnDrawCallback": function() {
+                $('[data-toggle="tooltip"]').tooltip();
+            }
+        });
 
     });
 </script>

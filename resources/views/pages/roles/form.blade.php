@@ -57,7 +57,18 @@
                                 <span class="text-danger">{{ $message}}</span>
                                 @enderror
                             </div>
-                        </div> 
+                        </div>
+                        <div class="row mb-3">
+                            <label for="nama" class="col-sm-2 col-form-label">Have Permissions</label>
+                            <div class="col-sm-10 px-3" style="display: grid; gap: 5px; grid-template-columns: repeat(3, minmax(0, 1fr));">
+                                @foreach ( $permissions as $item)
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="{{ $item->id }}" name="permissions[]" {{ $role->permissions->contains($item->id)?'checked':'' }}>
+                                    <label class="form-check-label" for="flexCheckDefault">{{ $item->name }}</label>
+                                </div>
+                                @endforeach
+                            </div>
+                        </div>
                         <div class="row">
                             <label class="col-sm-2 col-form-label"></label>
                             <div class="col-sm-10">

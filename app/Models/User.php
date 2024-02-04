@@ -24,7 +24,10 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'is_active',
+        'failed_try',
     ];
+    protected $appends = ['status','permission'];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -45,4 +48,41 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    public function getStatusAttribute()
+    {
+        $data[0] = [
+            'id' => 0,
+            'text' => 'Suspend',
+            'className' => 'bg-warning text-dark',
+        ];
+        $data[1] = [
+            'id' => 1,
+            'text' => 'Active',
+            'className' => 'bg-success',
+        ];
+        $data[-1] = [
+            'id' => -1,
+            'text' => 'Rejected',
+            'className' => 'bg-danger',
+        ];
+        return $data[$this->is_active];
+    }
+
+    public function hasEntities()
+    {
+        return $this->hasManyThrough(
+            SsoEntity::class,
+            SsoUserHasEntity::class,
+            'user_id', // Foreign key pada tabel perantara (SsoUserHasEntity)
+            'id', // Foreign key pada model User
+            'id', // Local key pada model User
+            'entity_id' // Local key pada tabel perantara (SsoUserHasEntity)
+        );
+    }
+
+    public function getPermissionAttribute()
+    {
+        return $this->getAllPermissions();
+    }
 }

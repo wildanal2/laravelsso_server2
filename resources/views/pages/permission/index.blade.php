@@ -2,7 +2,7 @@
 @section('title', 'Permission')
 
 @section('head')
-<link href="assets/theme/plugins/datatable/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
+<link href="{{ url('') }}/assets/theme/plugins/datatable/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
 
 @endsection
 
@@ -78,65 +78,64 @@
 @endsection
 
 @section('script')
-<script src="assets/theme/plugins/datatable/js/jquery.dataTables.min.js"></script>
-<script src="assets/theme/plugins/datatable/js/dataTables.bootstrap5.min.js"></script>
+<script src="{{ url('') }}/assets/theme/plugins/datatable/js/jquery.dataTables.min.js"></script>
+<script src="{{ url('') }}/assets/theme/plugins/datatable/js/dataTables.bootstrap5.min.js"></script>
 <script>
-    var main_table = $('#main-table').DataTable({
-        aLengthMenu: [
-            [10, 25, 50, 100, -1],
-            [10, 25, 50, 100, "All"]
-        ],
-        iDisplayLength: 10,
-        scrollX: true,
-        scrollCollapse: true,
-        processing: true,
-        serverSide: true,
-        ajax: {
-            url: "{{ route('permission.get') }}",
-            type: "GET",
-        },
-        columns: [{
-            title: '#',
-            data: 'id',
-            render: (data, type, row, meta) => {
-                return meta.row + meta.settings._iDisplayStart + 1;
-            },
-            className: 'text-center',
-            width: '75px',
-        }, {
-            title: 'Permission Name',
-            data: 'name',
-            width: '35%',
-        }, { 
-            title: 'Guard Name',
-            data: 'guard_name',
-            width: '35%',
-        }, {
-            title: 'Aksi',
-            data: 'id',
-            orderable: false,
-            searchable: false,
-            width: '20%',
-            className: 'no-wrap text-center',
-            render: (data, type, row, meta) => {
-                let html = "";
-                $.each(row.buttons, function(i, item) {
-                    let attribute = '';
-                    $.each(item.attribute, function(key, value) {
-                        attribute += `${value.name}="${value.text}"`;
-                    });
-                    html +=
-                        `<a href="${item.url}" class="btn ${item.className} mr-1" ${attribute} data-toggle="tooltip" title="${item.text}" data-placement="left"><i class="${item.fontawesome}"></i></a>`;
-                })
-                return html;
-            }
-        }],
-        "fnDrawCallback": function() {
-            $('[data-toggle="tooltip"]').tooltip();
-        }
-    });
-
     $(document).ready(function() {
+        var main_table = $('#main-table').DataTable({
+            aLengthMenu: [
+                [10, 25, 50, 100, -1],
+                [10, 25, 50, 100, "All"]
+            ],
+            iDisplayLength: 10,
+            scrollX: true,
+            scrollCollapse: true,
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: "{{ route('permission.get') }}",
+                type: "GET",
+            },
+            columns: [{
+                title: '#',
+                data: 'id',
+                render: (data, type, row, meta) => {
+                    return meta.row + meta.settings._iDisplayStart + 1;
+                },
+                className: 'text-center',
+                width: '75px',
+            }, {
+                title: 'Permission Name',
+                data: 'name',
+                width: '35%',
+            }, {
+                title: 'Guard Name',
+                data: 'guard_name',
+                width: '35%',
+            }, {
+                title: 'Aksi',
+                data: 'id',
+                orderable: false,
+                searchable: false,
+                width: '20%',
+                className: 'no-wrap text-center',
+                render: (data, type, row, meta) => {
+                    let html = "";
+                    $.each(row.buttons, function(i, item) {
+                        let attribute = '';
+                        $.each(item.attribute, function(key, value) {
+                            attribute += `${value.name}="${value.text}"`;
+                        });
+                        html +=
+                            `<a href="${item.url}" class="btn btn-sm ${item.className} mx-1" ${attribute} data-toggle="tooltip" title="${item.text}" data-placement="left"><i class="${item.fontawesome}" style="margin-left:-1px"></i></a>`;
+                    })
+                    return html;
+                }
+            }],
+            "fnDrawCallback": function() {
+                $('[data-toggle="tooltip"]').tooltip();
+            }
+        });
 
     });
 </script>

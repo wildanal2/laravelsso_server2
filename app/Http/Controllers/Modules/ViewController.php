@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Modules;
 
 use App\Http\Controllers\Controller;
 use App\Models\OAuthClient;
+use App\Models\SsoModule;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -12,7 +13,7 @@ class ViewController extends Controller
 
     public function index()
     {
-        $modules = OAuthClient::all();
+        $modules = SsoModule::all();
         $view_data['module_total'] = $modules->count();
 
         return view('pages.modules.index', $view_data);
@@ -28,7 +29,7 @@ class ViewController extends Controller
 
     public function form($mod = null)
     {
-        $view_data['client'] = OAuthClient::with([])->find($mod);
+        $view_data['module'] = SsoModule::with([])->find($mod);
 
         return view('pages.modules.form', $view_data);
     }

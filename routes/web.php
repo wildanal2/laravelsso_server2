@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -25,9 +27,12 @@ Route::group(['middleware' => ['auth']], function () {
     Route::group(['prefix' => 'users'], function () {
         Route::get('/', [App\Http\Controllers\User\ViewController::class, 'index'])->name('users');
         Route::get('/create', [App\Http\Controllers\User\ViewController::class, 'form'])->name('users.form');
+        Route::get('/{id}/detail', [App\Http\Controllers\User\ViewController::class, 'detail'])->name('users.detail');
         Route::get('/{id}/edit', [App\Http\Controllers\User\ViewController::class, 'form'])->name('users.edit');
 
         Route::get('/get', [App\Http\Controllers\User\DataController::class, 'get'])->name('users.get');
+        Route::post('/create', [App\Http\Controllers\User\DataController::class, 'submit']);
+        Route::post('/{id}/edit', [App\Http\Controllers\User\DataController::class, 'submit']);
     });
 
     Route::group(['prefix' => 'roles'], function () {
@@ -62,5 +67,38 @@ Route::group(['middleware' => ['auth']], function () {
         Route::post('/create', [App\Http\Controllers\Modules\DataController::class, 'submit']);
         Route::post('/{id}/edit', [App\Http\Controllers\Modules\DataController::class, 'submit']);
     });
-    
+
+    Route::group(['prefix' => 'entity'], function () {
+        Route::get('/', [App\Http\Controllers\Entity\ViewController::class, 'index'])->name('entity');
+        Route::get('/{id}/detail', [App\Http\Controllers\Entity\ViewController::class, 'detail'])->name('entity.detail');
+        Route::get('/create', [App\Http\Controllers\Entity\ViewController::class, 'form'])->name('entity.form');
+        Route::get('/{id}/edit', [App\Http\Controllers\Entity\ViewController::class, 'form'])->name('entity.edit');
+
+        Route::get('/get', [App\Http\Controllers\Entity\DataController::class, 'get'])->name('entity.get');
+        Route::post('/create', [App\Http\Controllers\Entity\DataController::class, 'submit']);
+        Route::post('/{id}/edit', [App\Http\Controllers\Entity\DataController::class, 'submit']);
+    });
+
+    Route::group(['prefix' => 'oclient'], function () {
+        Route::get('/', [App\Http\Controllers\OAuthClient\ViewController::class, 'index'])->name('oclient');
+        Route::get('/{id}/detail', [App\Http\Controllers\OAuthClient\ViewController::class, 'detail'])->name('oclient.detail');
+        Route::get('/create', [App\Http\Controllers\OAuthClient\ViewController::class, 'form'])->name('oclient.form');
+        Route::get('/{id}/edit', [App\Http\Controllers\OAuthClient\ViewController::class, 'form'])->name('oclient.edit');
+
+        Route::get('/get', [App\Http\Controllers\OAuthClient\DataController::class, 'get'])->name('oclient.get');
+        Route::post('/create', [App\Http\Controllers\OAuthClient\DataController::class, 'submit']);
+        Route::post('/{id}/edit', [App\Http\Controllers\OAuthClient\DataController::class, 'submit']);
+    });
+
+    Route::group(['prefix' => 'logs'], function () {
+        // Route::get('/system-logs', [App\Http\Controllers\Logs\SystemLogsController::class, 'index'])->name('logs.system');
+        Route::get('system-logs', [\Rap2hpoutre\LaravelLogViewer\LogViewerController::class, 'index'])->name('logs.system');
+    });
+
+    Route::group(['prefix' => 'select2'], function () {
+        Route::get('/get-entity', [\App\Http\Controllers\Entity\DataController::class, 'select2'])->name('select2.get-entity');
+    });
+
 });
+
+Route::get('/different-account', [App\Http\Controllers\HomeController::class, 'getDifferentAccount'])->name('different-account');

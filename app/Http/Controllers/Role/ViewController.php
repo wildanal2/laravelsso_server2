@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Role;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
 class ViewController extends Controller
@@ -25,7 +26,8 @@ class ViewController extends Controller
 
     public function form($role_id = null){
         $view_data['role'] = Role::with([])->find($role_id);
-        
+        $view_data['permissions'] = Permission::all();
+
         return view('pages.roles.form', $view_data);
     }
 

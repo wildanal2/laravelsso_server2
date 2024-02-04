@@ -2,7 +2,7 @@
 @section('title', 'Users')
 
 @section('head')
-<link href="assets/theme/plugins/datatable/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
+<link href="{{ url('') }}/assets/theme/plugins/datatable/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
 
 @endsection
 
@@ -49,7 +49,7 @@
             <div class="card rounded-4">
                 <div class="card-body">
                     <div class="d-flex align-items-center">
-                        <div class="">
+                        <div class="mb-0">
                             <p class="mb-1">Total Users</p>
                             <h4 class="mb-0">{{ $user_count }}</h4>
                         </div>
@@ -78,69 +78,75 @@
 @endsection
 
 @section('script')
-<script src="assets/theme/plugins/datatable/js/jquery.dataTables.min.js"></script>
-<script src="assets/theme/plugins/datatable/js/dataTables.bootstrap5.min.js"></script>
+<script src="{{ url('') }}/assets/theme/plugins/datatable/js/jquery.dataTables.min.js"></script>
+<script src="{{ url('') }}/assets/theme/plugins/datatable/js/dataTables.bootstrap5.min.js"></script>
 <script>
-    var main_table = $('#main-table').DataTable({
-        aLengthMenu: [
-            [10, 25, 50, 100, -1],
-            [10, 25, 50, 100, "All"]
-        ],
-        iDisplayLength: 10,
-        scrollX: true,
-        scrollCollapse: true,
-        processing: true,
-        serverSide: true,
-        ajax: {
-            url: "{{ route('users.get') }}",
-            type: "GET",
-        },
-        columns: [{
-            title: '#',
-            data: 'id',
-            render: (data, type, row, meta) => {
-                return meta.row + meta.settings._iDisplayStart + 1;
-            },
-            className: 'text-center',
-            width: '75px',
-        }, {
-            title: 'Name',
-            data: 'name',
-        }, {
-            title: 'Email',
-            data: 'email',
-        }, {
-            title: 'Entitas',
-            data: 'entity',
-        }, {
-            title: 'Role',
-            data: 'role',
-        }, {
-            title: 'Aksi',
-            data: 'id',
-            orderable: false,
-            searchable: false,
-            width: '1px',
-            className: 'no-wrap',
-            render: (data, type, row, meta) => {
-                let html = "";
-                $.each(row.buttons, function(i, item) {
-                    let attribute = '';
-                    $.each(item.attribute, function(key, value) {
-                        attribute += `${value.name}="${value.text}"`;
-                    });
-                    html +=
-                        `<a href="${item.url}" class="btn ${item.className}" ${attribute} data-toggle="tooltip" title="${item.text}" data-placement="left"><i class="${item.fontawesome}"></i></a>`;
-                })
-                return html;
-            }
-        }],
-        "fnDrawCallback": function() {
-            $('[data-toggle="tooltip"]').tooltip();
-        }
-    });
-
     $(document).ready(function() {
+        var main_table = $('#main-table').DataTable({
+            aLengthMenu: [
+                [10, 25, 50, 100, -1],
+                [10, 25, 50, 100, "All"]
+            ],
+            iDisplayLength: 10,
+            scrollX: true,
+            scrollCollapse: true,
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: "{{ route('users.get') }}",
+                type: "GET",
+            },
+            columns: [{
+                title: '#',
+                data: 'id',
+                render: (data, type, row, meta) => {
+                    return meta.row + meta.settings._iDisplayStart + 1;
+                },
+                className: 'text-center',
+                width: '75px',
+            }, {
+                title: 'Name',
+                data: 'name',
+            }, {
+                title: 'Email',
+                data: 'email',
+            }, {
+                title: 'Entity',
+                data: 'entity',
+            }, {
+                title: 'Role',
+                data: 'role',
+            }, {
+                title: 'Status',
+                data: 'status',
+                className: 'text-center',
+                render: (data, type, row, meta) => {
+                    return '<span class="badge ' + data.className + '">' + data.text + '</span>';
+                },
+            }, {
+                title: 'Aksi',
+                data: 'id',
+                orderable: false,
+                searchable: false,
+                width: '1px',
+                className: 'no-wrap',
+                render: (data, type, row, meta) => {
+                    let html = "";
+                    $.each(row.buttons, function(i, item) {
+                        let attribute = '';
+                        $.each(item.attribute, function(key, value) {
+                            attribute += `${value.name}="${value.text}"`;
+                        });
+                        html +=
+                            `<a href="${item.url}" class="btn btn-sm ${item.className} mx-1" ${attribute} data-toggle="tooltip" title="${item.text}" data-placement="left"><i class="${item.fontawesome}" style="margin-left:-1px"></i></a>`;
+                    })
+                    return html;
+                }
+            }],
+            "fnDrawCallback": function() {
+                $('[data-toggle="tooltip"]').tooltip();
+            }
+        });
 
     });
 </script>

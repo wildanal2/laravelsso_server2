@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 
 class HomeController extends Controller
 {
@@ -25,4 +27,12 @@ class HomeController extends Controller
     {
         return view('home');
     }
+
+    public function getDifferentAccount(Request $request){
+        Auth::logout();
+        Session::put('url.intended', $request->current_url);
+        //
+        return redirect('login');
+    }
+
 }
