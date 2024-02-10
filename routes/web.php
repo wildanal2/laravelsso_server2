@@ -15,13 +15,12 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [App\Http\Controllers\WelcomeController::class, 'index'])->name('index');
 
 Auth::routes();
+Route::get('/different-account', [App\Http\Controllers\HomeController::class, 'getDifferentAccount'])->name('different-account');
 
-Route::group(['middleware' => ['auth']], function () {
+Route::group(['middleware' => ['auth', 'auth.admin']], function () {
     Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
     Route::group(['prefix' => 'users'], function () {
@@ -33,6 +32,9 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/get', [App\Http\Controllers\User\DataController::class, 'get'])->name('users.get');
         Route::post('/create', [App\Http\Controllers\User\DataController::class, 'submit']);
         Route::post('/{id}/edit', [App\Http\Controllers\User\DataController::class, 'submit']);
+        Route::post('/{id}/resetAttempt', [App\Http\Controllers\User\DataController::class, 'resetAttempt']);
+        Route::put('/{id}/restore', [App\Http\Controllers\User\DataController::class, 'restore'])->name('users.restore');
+        Route::delete('/{id}', [App\Http\Controllers\User\DataController::class, 'destroy'])->name('users.destroy');
     });
 
     Route::group(['prefix' => 'roles'], function () {
@@ -44,6 +46,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/get', [App\Http\Controllers\Role\DataController::class, 'get'])->name('roles.get');
         Route::post('/create', [App\Http\Controllers\Role\DataController::class, 'submit']);
         Route::post('/{id}/edit', [App\Http\Controllers\Role\DataController::class, 'submit']);
+        Route::delete('/{id}', [App\Http\Controllers\Role\DataController::class, 'destroy']);
     });
 
     Route::group(['prefix' => 'permission'], function () {
@@ -55,6 +58,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/get', [App\Http\Controllers\Permission\DataController::class, 'get'])->name('permission.get');
         Route::post('/create', [App\Http\Controllers\Permission\DataController::class, 'submit']);
         Route::post('/{id}/edit', [App\Http\Controllers\Permission\DataController::class, 'submit']);
+        Route::delete('/{id}', [App\Http\Controllers\Permission\DataController::class, 'destroy']);
     });
 
     Route::group(['prefix' => 'modules'], function () {
@@ -66,6 +70,8 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/get', [App\Http\Controllers\Modules\DataController::class, 'get'])->name('module.get');
         Route::post('/create', [App\Http\Controllers\Modules\DataController::class, 'submit']);
         Route::post('/{id}/edit', [App\Http\Controllers\Modules\DataController::class, 'submit']);
+        Route::post('/{id}/module-feature', [App\Http\Controllers\Modules\DataController::class, 'submitFeature']);
+        Route::delete('/{id}', [App\Http\Controllers\Modules\DataController::class, 'destroy']);
     });
 
     Route::group(['prefix' => 'entity'], function () {
@@ -77,6 +83,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/get', [App\Http\Controllers\Entity\DataController::class, 'get'])->name('entity.get');
         Route::post('/create', [App\Http\Controllers\Entity\DataController::class, 'submit']);
         Route::post('/{id}/edit', [App\Http\Controllers\Entity\DataController::class, 'submit']);
+        Route::delete('/{id}', [App\Http\Controllers\Entity\DataController::class, 'destroy']);
     });
 
     Route::group(['prefix' => 'oclient'], function () {
@@ -88,6 +95,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/get', [App\Http\Controllers\OAuthClient\DataController::class, 'get'])->name('oclient.get');
         Route::post('/create', [App\Http\Controllers\OAuthClient\DataController::class, 'submit']);
         Route::post('/{id}/edit', [App\Http\Controllers\OAuthClient\DataController::class, 'submit']);
+        Route::delete('/{id}', [App\Http\Controllers\OAuthClient\DataController::class, 'destroy']);
     });
 
     Route::group(['prefix' => 'logs'], function () {
@@ -97,8 +105,6 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::group(['prefix' => 'select2'], function () {
         Route::get('/get-entity', [\App\Http\Controllers\Entity\DataController::class, 'select2'])->name('select2.get-entity');
+        Route::get('/get-module', [\App\Http\Controllers\Modules\DataController::class, 'select2'])->name('select2.get-module');
     });
-
 });
-
-Route::get('/different-account', [App\Http\Controllers\HomeController::class, 'getDifferentAccount'])->name('different-account');

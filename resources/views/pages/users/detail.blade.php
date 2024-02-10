@@ -89,7 +89,12 @@
                                 :
                             </td>
                             <td>
-                                {{ $user->failed_try }}x login Failed
+                                <div class="">
+                                    {{ $user->failed_try }}x login Failed
+                                    <button id="reset-login" class="middle none center rounded bg-blue-500 py-1 pl-1 pr-2 font-sans text-xs text-white shadow-md shadow-blue-500/20 transition-all hover:shadow-lg hover:shadow-blue-500/40 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none" data-ripple-light="true">
+                                        <i class="fadeIn animated bx bx-refresh"></i> Reset
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                         <tr>
@@ -148,7 +153,90 @@
 @section('script')
 <script>
     $(document).ready(function() {
+        $('#reset-login').on('click', function() {
+            Swal.fire({
+                title: 'Reset Login Attempt?',
+                text: 'You will reset login attempts on this account',
+                icon: 'warning',
+                showCancelButton: true,
+                showDenyButton: true,
+                showCancelButton: false,
+                denyButtonText: `Reset Attempt`,
+                confirmButtonText: 'Reset Attempt & Active Account',
+                cancelButtonText: 'cancel',
+                reverseButtons: true
+            }).then((result) => {
+                var pathname = window.location.pathname;
+                var segments = pathname.split('/');
+                var segmentTwo = segments[2];
+                var requestData = {};
+                if (result.isConfirmed) {
+                    requestData = {
+                        id: segmentTwo,
+                        reset: true,
+                        active: true
+                    };
+                    $.ajax({
+                        url: "{{ url('') }}/users/" + segmentTwo + "/resetAttempt", // Ganti nilai_id_anda dengan nilai yang sebenarnya
+                        type: 'POST',
+                        dataType: 'json', // Jika server mengembalikan data dalam format JSON
+                        data: requestData,
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        success: function(response) {
+                            Swal.fire("Saved!", "" + response?.message, "success").then(() => {
+                                location.reload();
+                            });
+                        },
+                        error: function(error) {
+                            console.error(error);
+                            Lobibox.notify("error", {
+                                pauseDelayOnHover: true,
+                                continueDelayOnInactiveTab: false,
+                                position: 'top right',
+                                msg: "Something Wrong! please try Again"
+                            });
+                        }
+                    });
+                } else if (result.isDenied) {
+                    requestData = {
+                        id: segmentTwo,
+                        reset: true,
+                    };
+                    $.ajax({
+                        url: "{{ url('') }}/users/" + segmentTwo + "/resetAttempt", // Ganti nilai_id_anda dengan nilai yang sebenarnya
+                        type: 'POST',
+                        dataType: 'json', // Jika server mengembalikan data dalam format JSON
+                        data: requestData,
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        success: function(response) {
+                            Swal.fire("Saved!", "" + response?.message, "success").then(() => {
+                                location.reload();
+                            });
+                            Lobibox.notify("success", {
+                                pauseDelayOnHover: true,
+                                continueDelayOnInactiveTab: false,
+                                position: 'top right',
+                                msg: "" + response?.message
+                            });
+                        },
+                        error: function(error) {
+                            console.error(error);
+                            Lobibox.notify("error", {
+                                pauseDelayOnHover: true,
+                                continueDelayOnInactiveTab: false,
+                                position: 'top right',
+                                msg: "Something Wrong! please try Again"
+                            });
+                        }
+                    });
+                }
 
+            });
+        });
 
     });
 </script>

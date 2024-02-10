@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Permission;
 
 use App\Http\Controllers\Controller;
+use App\Models\SsoModuleFeature;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Permission;
@@ -19,8 +20,9 @@ class ViewController extends Controller
 
     public function detail($role_id = null)
     {
-        $view_data['permission'] = Permission::with([])->find($role_id);
-
+        $view_data['permission'] = Permission::with([])->findOrFail($role_id);
+        $view_data['feature'] = SsoModuleFeature::where('id', $view_data['permission']->feature_id)->first();;
+        
         return view('pages.permission.detail', $view_data);
     }
 

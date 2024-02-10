@@ -13,13 +13,13 @@
         {{ config('app.name', 'Laravel') }}
     </title>
 
+    <!-- Scripts --> 
+    @vite(['resources/sass/app.scss', 'resources/js/app.js'])
     <!--plugins-->
     <link rel="stylesheet" href="{{ url('') }}/assets/theme/plugins/notifications/css/lobibox.min.css" />
     <link href="{{ url('') }}/assets/theme/plugins/simplebar/css/simplebar.css" rel="stylesheet" />
     <link href="{{ url('') }}/assets/theme/plugins/perfect-scrollbar/css/perfect-scrollbar.css" rel="stylesheet" />
     <link href="{{ url('') }}/assets/theme/plugins/metismenu/css/metisMenu.min.css" rel="stylesheet" />
-    <!-- Scripts --> 
-    @vite(['resources/sass/app.scss', 'resources/js/app.js'])
     <link href="{{ url('') }}/assets/theme/css/bootstrap.min.css" rel="stylesheet" />
     <!-- Bootstrap CSS -->
     <link href="{{ url('') }}/assets/theme/css/bootstrap-extended.css" rel="stylesheet" />
@@ -27,7 +27,7 @@
     <link href="{{ url('') }}/assets/theme/css/icons.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
-
+    
     <!-- loader-->
     <link href="{{ url('') }}/assets/theme/css/pace.min.css" rel="stylesheet" />
 
@@ -37,6 +37,7 @@
     <link href="{{ url('') }}/assets/theme/css/semi-dark.css" rel="stylesheet" />
     <link href="{{ url('') }}/assets/theme/css/header-colors.css" rel="stylesheet" />
     
+    @vite(['resources/css/app.css'])
 
     @yield('head')
 </head>

@@ -49,8 +49,8 @@
                         </div>
                         <hr />
                         {{ csrf_field() }}
-                        <div class="row mb-3">
-                            <label for="nama" class="col-sm-3 col-form-label">Application Name</label>
+                        <div class="row my-6">
+                            <label for="nama" class="col-sm-3 col-form-label required-field">Application Name</label>
                             <div class="col-sm-9">
                                 <input type="text" class="form-control @error('nama') is-invalid @enderror" id="nama" name="nama" value="{{ old('nama', $client->name ?? '') }}" placeholder="Enter Application Name" autocomplete="nama-application" required>
                                 @error('nama')
@@ -59,9 +59,9 @@
                             </div>
                         </div>
                         <div class="row mb-3">
-                            <label for="redirect" class="col-sm-3 col-form-label">Redirect</label>
+                            <label for="redirect" class="col-sm-3 col-form-label required-field">Redirect</label>
                             <div class="col-sm-9">
-                                <input type="text" class="form-control @error('redirect') is-invalid @enderror" id="redirect" name="redirect" value="{{ old('redirect', $client->redirect ?? '') }}" placeholder="Enter URI redirect (Callabck) Application">
+                                <input type="text" class="form-control @error('redirect') is-invalid @enderror" id="redirect" name="redirect" value="{{ old('redirect', $client->redirect ?? '') }}" placeholder="Enter URI redirect (Callabck) Application" required>
                                 @error('redirect')
                                 <span class="text-danger">{{ $message}}</span>
                                 @enderror
@@ -91,7 +91,7 @@
                             <label class="col-sm-3 col-form-label"></label>
                             <div class="col-sm-9">
                                 <br>
-                                <button type="submit" class="btn btn-primary px-5 pt-10">{{ ($client ? 'Update':'Create') }}</button>
+                                <button type="submit" class="btn btn-primary text-light-blue-900 px-5">{{ ($client ? 'Update':'Create') }}</button>
                             </div>
                         </div>
                     </div>

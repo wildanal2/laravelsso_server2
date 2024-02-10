@@ -59,6 +59,7 @@
                     </div>
                 </div>
             </div>
+
         </div>
     </div>
     <!--end widget-->
@@ -81,6 +82,97 @@
 <script src="{{ url('') }}/assets/theme/plugins/datatable/js/jquery.dataTables.min.js"></script>
 <script src="{{ url('') }}/assets/theme/plugins/datatable/js/dataTables.bootstrap5.min.js"></script>
 <script>
+    function destroyUser(id, name) {
+        Swal.fire({
+            title: 'Are you sure to Delete Account?',
+            text: 'You will Delete account `' + name + '`',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: "#DC3741",
+            confirmButtonText: 'Delete Account',
+            cancelButtonText: 'cancel',
+            reverseButtons: true
+        }).then((result) => {
+            var requestData = {};
+            if (result.isConfirmed) {
+                $.ajax({
+                    type: 'DELETE',
+                    url: "{{ url('') }}/users/" + id,
+                    dataType: 'json',
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        Swal.fire("Saved!", "" + response?.message, "success").then(() => {
+                            location.reload();
+                        });
+                        Lobibox.notify("success", {
+                            pauseDelayOnHover: true,
+                            continueDelayOnInactiveTab: false,
+                            position: 'top right',
+                            msg: "" + response?.message
+                        });
+                    },
+                    error: function(error) {
+                        console.error(error);
+                        Lobibox.notify("error", {
+                            pauseDelayOnHover: true,
+                            continueDelayOnInactiveTab: false,
+                            position: 'top right',
+                            msg: "Something Wrong! please try Again"
+                        });
+                    }
+                });
+            }
+
+        });
+    }
+
+    function restoreUser(id, name) {
+        Swal.fire({
+            title: 'Are you sure to Restore Account?',
+            text: 'You will Restore account `' + name + '`',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Restore Account',
+            cancelButtonText: 'cancel',
+            reverseButtons: true
+        }).then((result) => {
+            var requestData = {};
+            if (result.isConfirmed) {
+                $.ajax({
+                    type: 'PUT',
+                    url: "{{ url('') }}/users/" + id + "/restore",
+                    dataType: 'json',
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        Swal.fire("Saved!", "" + response?.message, "success").then(() => {
+                            location.reload();
+                        });
+                        Lobibox.notify("success", {
+                            pauseDelayOnHover: true,
+                            continueDelayOnInactiveTab: false,
+                            position: 'top right',
+                            msg: "" + response?.message
+                        });
+                    },
+                    error: function(error) {
+                        console.error(error);
+                        Lobibox.notify("error", {
+                            pauseDelayOnHover: true,
+                            continueDelayOnInactiveTab: false,
+                            position: 'top right',
+                            msg: "Something Wrong! please try Again"
+                        });
+                    }
+                });
+            }
+
+        });
+    }
+
     $(document).ready(function() {
         var main_table = $('#main-table').DataTable({
             aLengthMenu: [
@@ -114,6 +206,9 @@
                 title: 'Entity',
                 data: 'entity',
             }, {
+                title: 'Module',
+                data: 'module',
+            }, {
                 title: 'Role',
                 data: 'role',
             }, {
@@ -121,7 +216,11 @@
                 data: 'status',
                 className: 'text-center',
                 render: (data, type, row, meta) => {
-                    return '<span class="badge ' + data.className + '">' + data.text + '</span>';
+                    let html = "";
+                    $.each(row.status, function(i, item) {
+                        html += '<span class="badge ' + item.className + ' mr-1">' + item.text + '</span>';
+                    });
+                    return html;
                 },
             }, {
                 title: 'Aksi',
@@ -145,6 +244,18 @@
             }],
             "fnDrawCallback": function() {
                 $('[data-toggle="tooltip"]').tooltip();
+
+                $('.btn-user-destroy').on('click', function() {
+                    var id = $(this).data('id');
+                    var name = $(this).data('name');
+                    destroyUser(id, name);
+                });
+
+                $('.btn-user-restore').on('click', function() {
+                    var id = $(this).data('id');
+                    var name = $(this).data('name');
+                    restoreUser(id, name);
+                });
             }
         });
 

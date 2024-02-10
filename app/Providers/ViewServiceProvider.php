@@ -45,58 +45,58 @@ class ViewServiceProvider extends ServiceProvider
                 ],
                 [
                     'text' => 'Menu',
-                    'permission' => ['manage-entitas', 'view-user', 'manage-role', 'manage-permission'],
+                    'permission' => ['sso.manage-users', 'sso.manage-roles', 'sso.manage-permissions'],
                 ],
                 [
                     'text' => 'Users',
                     'icon' => 'bx bx-user',
-                    'permission' => ['user.list'],
+                    'permission' => ['sso.manage-users'],
                     'url' => route('users'),
                     'active' => $segment[1] == 'users',
                 ],
                 [
                     'text' => 'Role',
                     'icon' => 'bx bxs-user-account',
-                    'permission' => ['user.list'],
+                    'permission' => ['sso.manage-roles'],
                     'url' => route('roles'),
                     'active' => $segment[1] == 'roles',
                 ],
                 [
                     'text' => 'Permission',
                     'icon' => 'bi bi-person-lines-fill',
-                    'permission' => ['permission.list'],
+                    'permission' => ['sso.manage-permissions'],
                     'url' => route('permission'),
                     'active' => $segment[1] == 'permission',
                 ],
                 [
                     'text' => 'Others',
-                    'permission' => ['manage-entitas', 'view-user', 'manage-role', 'manage-permission'],
+                    'permission' => ['sso.manage-modules', 'sso.manage-entity', 'sso.manage-oauth-client'],
                 ],  
                 [
                     'text' => 'Module',
                     'icon' => 'bx bx-vector',
-                    'permission' => ['module.list'],
+                    'permission' => ['sso.manage-modules'],
                     'url' => route('module'),
                     'active' => $segment[1] == 'modules',
                 ],
                 [
                     'text' => 'Entity',
                     'icon' => 'bx bx-buildings',
-                    'permission' => ['entity.list'],
+                    'permission' => ['sso.manage-entity'],
                     'url' => route('entity'),
                     'active' => $segment[1] == 'entity',
                 ],
                 [
                     'text' => 'OAuth Client',
                     'icon' => 'bx bx-network-chart',
-                    'permission' => ['oclient.list'],
+                    'permission' => ['sso.manage-oauth-client'],
                     'url' => route('oclient'),
                     'active' => $segment[1] == 'oclient',
                 ],
                 [
                     'text' => "Logs",
                     'icon' => 'lni lni-indent-increase',
-                    'permission' => ['logs.view'],
+                    'permission' => ['sso.system-logs'],
                     'active' => $segment[1] == 'logss',
                     'dropdown' => [
                         [
@@ -285,8 +285,7 @@ class ViewServiceProvider extends ServiceProvider
         $result = [];
         foreach ($menu as $item) {
             if (!($item['show'] ?? true)) continue;
-            // if (isset($item['permission']) && !auth()->user()->canany($item['permission'])) continue;
-
+            if (isset($item['permission']) && !auth()->user()->canany($item['permission'])) continue;
 
             if (isset($item['dropdown'])) {
                 $temp = [];

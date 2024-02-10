@@ -78,9 +78,9 @@
                                 :
                             </td>
                             <td>
-                                <ul class="list-group">
+                                <ul>
                                     @foreach ($role->permissions->pluck('name') as $item)
-                                    <li class="list-group-item">⦿ {{$item}}</li>
+                                    <li class="list-group-item py-1">⦿ {{$item}}</li>
                                     @endforeach
                                 </ul>
                             </td>

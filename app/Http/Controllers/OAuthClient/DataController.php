@@ -17,7 +17,7 @@ class DataController extends Controller
     public function get()
     {
         $query = OAuthClient::all();
-        // dd($query);
+        
         return DataTables::of($query)
             ->addColumn('secret', function ($eloquent) {
                 return '**********';
@@ -25,14 +25,6 @@ class DataController extends Controller
             ->addColumn('buttons', function ($eloquent) {
                 $array = [];
                 $user = auth()->user();
-                // if ($user->hasPermissionTo('edit-user')) {
-                //     $array[] = [
-                //         'url' => url('users/' . $eloquent->id . '/edit'),
-                //         'className' => 'btn-success',
-                //         'text' => 'Edit',
-                //         'fontawesome' => 'fa-user-cog',
-                //     ];
-                // } 
                 $array[] = [
                     'url' => url('oclient/' . $eloquent->id . '/detail'),
                     'className' => 'btn-outline-secondary',
@@ -45,16 +37,34 @@ class DataController extends Controller
                     'text' => 'Edit',
                     'fontawesome' => 'lni lni-cogs',
                 ];
+                if ($user->hasPermissionTo('sso.manage-oauth-client')) {
+                    $array[] = [
+                        'url' => 'javascript:void(0)',
+                        'className' => 'btn-outline-secondary btn-oauth-destroy',
+                        'text' => 'Delete',
+                        'fontawesome' => 'lni lni-trash',
+                        'attribute' => [
+                            [
+                                'name' => 'data-id',
+                                'text' => $eloquent->id,
+                            ],
+                            [
+                                'name' => 'data-name',
+                                'text' => $eloquent->name,
+                            ],
+                        ],
+                    ];
+                }
                 return $array;
             })
             ->make(true);
     }
 
-    public function submit($module_id = null)
+    public function submit($id = null)
     {
         try {
-            if ($module_id != null) {
-                $client = OAuthClient::find($module_id);
+            if ($id != null) {
+                $client = OAuthClient::find($id);
             }
             // validate
             request()->validate([
@@ -73,7 +83,7 @@ class DataController extends Controller
                 $uri = request()->input('redirect');
                 $client = $clients->create(null, $client_name, $uri);
                 $message = 'Successfully Create Module';
-            }else{
+            } else {
                 $client->name = request()->input('nama');
                 $client->redirect = request()->input('redirect');
                 $client->save();
@@ -82,6 +92,27 @@ class DataController extends Controller
 
             DB::connection('mysql')->commit();
             Log::info(json_encode(["message" => $message, "auth_user" => Auth()->user()->toArray(), "data" => request()->all()]));
+            return $this->responseRedirect('oclient', $message, 200);
+        } catch (\Exception $e) {
+            DB::connection('mysql')->rollback();
+            Log::info(json_encode(["message" => $e, "auth_user" => Auth()->user()->toArray()]));
+            return $this->error_handler($e);
+        }
+    }
+
+    public function destroy($id = null)
+    {
+        try {
+            // validate  
+            $oauth = OAuthClient::findOrFail($id);
+            // 
+            DB::connection('mysql')->beginTransaction();
+
+            $oauth->delete();
+            $message = 'Successfully Delete Oauth Client';
+
+            DB::connection('mysql')->commit();
+            Log::info(json_encode(["message" => $message, "auth_user" => Auth()->user()->toArray(), "data" => $oauth]));
             return $this->responseRedirect('oclient', $message, 200);
         } catch (\Exception $e) {
             DB::connection('mysql')->rollback();

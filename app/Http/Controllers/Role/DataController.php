@@ -20,11 +20,11 @@ class DataController extends Controller
     public function get()
     {
         $query = Role::with(['permissions']);
-        // dd($query);
-        return DataTables::of($query) 
+        
+        return DataTables::of($query)
             ->addColumn('permission', function ($eloquent) {
                 $permission_list = $eloquent->permissions->pluck('name');
- 
+
                 return $permission_list->implode(', ');
             })
             ->addColumn('entity', function ($eloquent) {
@@ -33,14 +33,6 @@ class DataController extends Controller
             ->addColumn('buttons', function ($eloquent) {
                 $array = [];
                 $user = auth()->user();
-                // if ($user->hasPermissionTo('edit-user')) {
-                //     $array[] = [
-                //         'url' => url('users/' . $eloquent->id . '/edit'),
-                //         'className' => 'btn-success',
-                //         'text' => 'Edit',
-                //         'fontawesome' => 'fa-user-cog',
-                //     ];
-                // } 
                 $array[] = [
                     'url' => url('roles/' . $eloquent->id . '/detail'),
                     'className' => 'btn-outline-secondary',
@@ -53,6 +45,24 @@ class DataController extends Controller
                     'text' => 'Edit',
                     'fontawesome' => 'lni lni-cogs',
                 ];
+                if ($user->hasPermissionTo('sso.manage-roles')) {
+                    $array[] = [
+                        'url' => 'javascript:void(0)',
+                        'className' => 'btn-outline-secondary btn-roles-destroy',
+                        'text' => 'Delete',
+                        'fontawesome' => 'lni lni-trash',
+                        'attribute' => [
+                            [
+                                'name' => 'data-id',
+                                'text' => $eloquent->id,
+                            ],
+                            [
+                                'name' => 'data-name',
+                                'text' => $eloquent->name,
+                            ],
+                        ],
+                    ];
+                }
                 return $array;
             })
             ->make(true);
@@ -74,20 +84,41 @@ class DataController extends Controller
 
             if (!isset($role)) {
                 $role_name = request()->input('nama');
-                $role = Role::create(['name' => $role_name ]);
+                $role = Role::create(['name' => $role_name]);
                 $message = 'Successfully Create Role';
-            }else{
+            } else {
                 $role->name = request()->input('nama');
                 $role->save();
                 $message = 'Successfully Update Role';
             }
 
             // syncPermissions
-            $permissions = Permission::whereIn('id', request()->input('permissions')??[])->get();
+            $permissions = Permission::whereIn('id', request()->input('permissions') ?? [])->get();
             $role->syncPermissions($permissions->pluck('name'));
 
             DB::connection('mysql')->commit();
             Log::info(json_encode(["message" => $message, "auth_user" => Auth()->user()->toArray(), "data" => request()->all()]));
+            return $this->responseRedirect('roles', $message, 200);
+        } catch (\Exception $e) {
+            DB::connection('mysql')->rollback();
+            Log::info(json_encode(["message" => $e, "auth_user" => Auth()->user()->toArray()]));
+            return $this->error_handler($e);
+        }
+    }
+
+    public function destroy($role_id = null)
+    {
+        try {
+            // validate  
+            $role = Role::findOrFail($role_id);
+            // 
+            DB::connection('mysql')->beginTransaction();
+
+            $role->delete();
+            $message = 'Successfully Delete Role';
+
+            DB::connection('mysql')->commit();
+            Log::info(json_encode(["message" => $message, "auth_user" => Auth()->user()->toArray(), "data" => $role]));
             return $this->responseRedirect('roles', $message, 200);
         } catch (\Exception $e) {
             DB::connection('mysql')->rollback();

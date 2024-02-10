@@ -3,7 +3,18 @@
 
 @section('head')
 <link href="{{ url('') }}/assets/theme/plugins/datatable/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
-
+<style>
+    .wid-td {
+        max-width: 240px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .wid-td-link {
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+</style>
 @endsection
 
 @section('content')
@@ -81,6 +92,52 @@
 <script src="{{ url('') }}/assets/theme/plugins/datatable/js/jquery.dataTables.min.js"></script>
 <script src="{{ url('') }}/assets/theme/plugins/datatable/js/dataTables.bootstrap5.min.js"></script>
 <script>
+    function destroy(id, name) {
+        Swal.fire({
+            title: 'Are you sure to Delete Module?',
+            text: 'You will Delete module`' + name + '`',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: "#DC3741",
+            confirmButtonText: 'Delete Module',
+            cancelButtonText: 'cancel',
+            reverseButtons: true
+        }).then((result) => {
+            var requestData = {};
+            if (result.isConfirmed) {
+                $.ajax({
+                    type: 'delete',
+                    url: "{{ url('') }}/modules/" + id,
+                    dataType: 'json',
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        Swal.fire("Saved!", "" + response?.message, "success").then(() => {
+                            location.reload();
+                        });
+                        Lobibox.notify("success", {
+                            pauseDelayOnHover: true,
+                            continueDelayOnInactiveTab: false,
+                            position: 'top right',
+                            msg: "" + response?.message
+                        });
+                    },
+                    error: function(error) {
+                        console.error(error);
+                        Lobibox.notify("error", {
+                            pauseDelayOnHover: true,
+                            continueDelayOnInactiveTab: false,
+                            position: 'top right',
+                            msg: "Something Wrong! please try Again"
+                        });
+                    }
+                });
+            }
+
+        });
+    }
+
     $(document).ready(function() {
         var main_table = $('#main-table').DataTable({
             aLengthMenu: [
@@ -113,10 +170,29 @@
             }, {
                 title: 'Description',
                 data: 'description',
+                className: 'wid-td',
+            }, {
+                title: 'URL',
+                data: 'url',
+                className: 'text-center wid-td-link',
+                render: (data, type, row, meta) => {
+                    if (data) {
+                        return '<a href="' + data + '">' + data + '</a>';
+                    } else {
+                        return '-';
+                    }
+                }
             }, {
                 title: 'Version',
                 data: 'last_version',
                 className: 'text-center',
+            }, {
+                title: 'Revoked',
+                data: 'revoked',
+                className: 'text-center',
+                render: (data) => {
+                    return data ? '<span class="badge bg-danger">Revoked</span>' : '<span class="badge bg-success">False</span>';
+                }
             }, {
                 title: 'Aksi',
                 data: 'id',
@@ -139,6 +215,11 @@
             }],
             "fnDrawCallback": function() {
                 $('[data-toggle="tooltip"]').tooltip();
+                $('.btn-module-destroy').on('click', function() {
+                    var id = $(this).data('id');
+                    var name = $(this).data('name');
+                    destroy(id, name);
+                });
             }
         });
 

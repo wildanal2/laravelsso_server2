@@ -49,20 +49,33 @@
                         </div>
                         <hr />
                         {{ csrf_field() }}
-                        <div class="row mb-3">
-                            <label for="name" class="col-sm-3 col-form-label">Enter Name</label>
+                        <div class="row mb-3 mt-3">
+                            <label for="name" class="col-sm-3 col-form-label required-field">Enter Name</label>
                             <div class="col-sm-9">
-                                <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name', $user->name ?? '') }}" placeholder="Enter Name for user" autocomplete="name">
+                                <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name', $user->name ?? '') }}" placeholder="Enter Name for user" autocomplete="name" required>
                                 @error('name')
                                 <span class="text-danger">{{ $message}}</span>
                                 @enderror
                             </div>
                         </div>
                         <div class="row mb-3">
-                            <label for="email" class="col-sm-3 col-form-label">Email Address</label>
+                            <label for="email" class="col-sm-3 col-form-label required-field">Email Address</label>
                             <div class="col-sm-9">
-                                <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email" value="{{ old('email', $user->email ?? '') }}" placeholder="Email Address" autocomplete="new-email">
+                                <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email" value="{{ old('email', $user->email ?? '') }}" placeholder="Email Address" autocomplete="new-email" required>
                                 @error('email')
+                                <span class="text-danger">{{ $message}}</span>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <label for="module" class="col-sm-3 col-form-label">Modules</label>
+                            <div class="col-sm-9">
+                                <select class="form-control select2-module @error('module') is-invalid @enderror" name="module[]" multiple="multiple" data-placeholder="Select Module">
+                                    @foreach ($module ??[] as $item)
+                                    <option value="{{ $item->id }}" {{ $user?->hasModule?->pluck('id')->contains($item->id)? 'selected':'' }}>{{ $item->name }}</option>
+                                    @endforeach
+                                </select>
+                                @error('module')
                                 <span class="text-danger">{{ $message}}</span>
                                 @enderror
                             </div>
@@ -81,9 +94,9 @@
                             </div>
                         </div>
                         <div class="row mb-3">
-                            <label for="role" class="col-sm-3 col-form-label">Role</label>
+                            <label for="role" class="col-sm-3 col-form-label required-field">Role</label>
                             <div class="col-sm-9">
-                                <select class="form-control select2-role @error('role') is-invalid @enderror" name="role[]" multiple="multiple" data-placeholder="Select Role">
+                                <select class="form-control select2-role @error('role') is-invalid @enderror" name="role[]" multiple="multiple" data-placeholder="Select Role" required>
                                     @foreach ($role ??[] as $item)
                                     <option value="{{ $item->id }}" {{ $user?->roles?->pluck('id')->contains($item->id)? 'selected':'' }}>{{ $item->name }}</option>
                                     @endforeach
@@ -102,7 +115,7 @@
                         </div>
                         @endif
                         <div class="row mb-3 reset-pass {{ isset($user)? 'd-none':'' }}">
-                            <label for="new-password" class="col-sm-3 col-form-label">Choose Password</label>
+                            <label for="new-password" class="col-sm-3 col-form-label required-field">Choose Password</label>
                             <div class="col-sm-9">
                                 <input type="password" class="form-control @error('new-password') is-invalid @enderror" id="new-password" name="new-password" placeholder="Choose New Password" autocomplete="new-password">
                                 @error('new-password')
@@ -122,13 +135,13 @@
                         <div class="row">
                             <label class="col-sm-3 col-form-label"></label>
                             <div class="col-sm-9">
-                                <button type="submit" class="btn btn-primary px-5">{{ ($user ? 'Update':'Registration') }}</button>
+                                <button type="submit" class="btn btn-primary px-5 text-light-blue-900">{{ ($user ? 'Update':'Registration') }}</button>
                                 @if ($user && $user->is_active !=0)
-                                <button type="button" class="btn btn-warning mx-3" id="btn-suspend-user">
+                                <button type="button" class="btn btn-warning mx-3 text-orange-300" id="btn-suspend-user">
                                     <i class="fadeIn animated bx bx-user-x" style="margin-top: -20px;"></i>Suspend</button>
                                 @endif
                                 @if ($user && $user->is_active ==0)
-                                <button type="button" class="btn btn-success mx-3" id="btn-active-user">
+                                <button type="button" class="btn btn-success mx-3 text-green-500" id="btn-active-user">
                                     <i class="fadeIn animated bx bx-user-check" style="margin-top: -20px; padding-right: 5px;"></i>Set Active</button>
                                 @endif
                             </div>
@@ -147,6 +160,27 @@
     $('.select2-entity').select2({
         ajax: {
             url: "{{ route('select2.get-entity') }}",
+            data: function(item) {
+                return {
+                    term: item.term,
+                    page: item.page,
+                }
+            },
+            dataType: 'json',
+            processResults: function(data, params) {
+                params.page = params.page || 1;
+                return data;
+            },
+            cache: true
+        },
+        allowClear: true,
+        escapeMarkup: function(markup) {
+            return markup;
+        },
+    });
+    $('.select2-module').select2({
+        ajax: {
+            url: "{{ route('select2.get-module') }}",
             data: function(item) {
                 return {
                     term: item.term,
@@ -193,6 +227,7 @@
             addNewInput(0);
             $('#form-main').submit();
         });
+
         $('#btn-active-user').on('click', function() {
             addNewInput(1);
             $('#form-main').submit();

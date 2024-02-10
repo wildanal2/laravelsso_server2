@@ -49,19 +49,19 @@
                         </div>
                         <hr />
                         {{ csrf_field() }}
-                        <div class="row mb-3">
-                            <label for="company_reg" class="col-sm-3 col-form-label">Company Registration</label>
+                        <div class="row my-6">
+                            <label for="company_reg" class="col-sm-3 col-form-label required-field">Company Registration</label>
                             <div class="col-sm-9">
-                                <input type="text" class="form-control @error('company_reg') is-invalid @enderror" id="company_reg" name="company_reg" value="{{ old('company_reg', $entity->company_reg ?? '') }}" placeholder="Enter Company Registration" autocomplete="company_reg">
+                                <input type="text" class="form-control @error('company_reg') is-invalid @enderror" id="company_reg" name="company_reg" value="{{ old('company_reg', $entity->company_reg ?? '') }}" placeholder="Enter Company Registration" autocomplete="company_reg" required>
                                 @error('company_reg')
                                 <span class="text-danger">{{ $message}}</span>
                                 @enderror
                             </div>
                         </div>
                         <div class="row mb-3">
-                            <label for="name" class="col-sm-3 col-form-label">Name</label>
+                            <label for="name" class="col-sm-3 col-form-label required-field">Name</label>
                             <div class="col-sm-9">
-                                <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name', $entity->name ?? '') }}" placeholder="Enter Application Name" autocomplete="name">
+                                <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name', $entity->name ?? '') }}" placeholder="Enter Application Name" autocomplete="name" required>
                                 @error('name')
                                 <span class="text-danger">{{ $message}}</span>
                                 @enderror
@@ -89,7 +89,7 @@
                             <label class="col-sm-3 col-form-label"></label>
                             <div class="col-sm-9">
                                 <br>
-                                <button type="submit" class="btn btn-primary px-5 pt-10">{{ ($entity ? 'Update':'Create') }}</button>
+                                <button type="submit" class="btn btn-primary text-light-blue-900 px-5">{{ ($entity ? 'Update':'Create') }}</button>
                             </div>
                         </div>
                     </div>

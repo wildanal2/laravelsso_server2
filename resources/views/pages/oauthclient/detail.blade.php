@@ -100,7 +100,7 @@
                                 :
                             </td>
                             <td>
-                                {!! $client->revoked ? '<span class="badge bg-danger">Revoked</span>':'<span class="badge bg-success">Active</span>' !!}
+                                {!! $client->revoked ? '<span class="badge bg-danger">Revoked</span>':'<span class="badge bg-success">False</span>' !!}
                             </td>
                         </tr>
                     </table>

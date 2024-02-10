@@ -49,10 +49,10 @@
                         </div>
                         <hr />
                         {{ csrf_field() }}
-                        <div class="row mb-3">
-                            <label for="nama" class="col-sm-2 col-form-label">Permission Name</label>
+                        <div class="row my-6">
+                            <label for="nama" class="col-sm-2 col-form-label required-field">Permission Name</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control @error('nama') is-invalid @enderror" id="nama" name="nama" value="{{ old('nama', $permission->name ?? '') }}" placeholder="Enter Permission Name" autocomplete="permission-name">
+                                <input type="text" class="form-control @error('nama') is-invalid @enderror" id="nama" name="nama" value="{{ old('nama', $permission->name ?? '') }}" placeholder="Enter Permission Name" autocomplete="permission-name" required>
                                 @error('nama')
                                 <span class="text-danger">{{ $message}}</span>
                                 @enderror
@@ -80,7 +80,7 @@
                             <label class="col-sm-2 col-form-label"></label>
                             <div class="col-sm-10">
                                 <br>
-                                <button type="submit" class="btn btn-primary px-5">{{ ($permission ? 'Update':'Create') }}</button>
+                                <button type="submit" class="btn btn-primary text-light-blue-900 px-5">{{ ($permission ? 'Update':'Create') }}</button>
                             </div>
                         </div>
                     </div>

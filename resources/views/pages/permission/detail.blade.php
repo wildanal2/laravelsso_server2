@@ -47,7 +47,7 @@
                         <h5 class="mb-0">Permission Detail</h5>
                     </div>
                     <hr />
-                    <table cellpadding="5px" class="table-vcenter">
+                    <table cellpadding="5px" class="table-vcenter my-3">
                         <tr>
                             <th width="200px">
                                 Permission Name
@@ -57,6 +57,17 @@
                             </td>
                             <td>
                                 {{ $permission->name ?? '' }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th width="200px">
+                                Module Feature
+                            </th>
+                            <td>
+                                :
+                            </td>
+                            <td>
+                                {{ $feature->name ?? '' }}
                             </td>
                         </tr>
                         <tr>

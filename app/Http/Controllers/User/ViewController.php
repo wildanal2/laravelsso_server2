@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
+use App\Models\SsoModule;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
@@ -19,7 +20,7 @@ class ViewController extends Controller
 
     public function detail($role_id = null)
     {
-        $view_data['user'] = User::with(['hasEntities'])->find($role_id);
+        $view_data['user'] = User::with(['hasEntities'])->findOrFail($role_id);
 
         return view('pages.users.detail', $view_data);
     }
@@ -29,7 +30,8 @@ class ViewController extends Controller
     {
         $view_data['user'] = User::with(['hasEntities'])->find($user_id);
         $view_data['role'] = Role::all();
-        
+        $view_data['module'] = SsoModule::all();
+        // dd($view_data['user']->hasModule);
         return view('pages.users.form', $view_data);
     }
 }

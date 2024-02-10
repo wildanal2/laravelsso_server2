@@ -49,10 +49,10 @@
                         </div>
                         <hr />
                         {{ csrf_field() }}
-                        <div class="row mb-3">
-                            <label for="nama" class="col-sm-2 col-form-label">Role Name</label>
+                        <div class="row mb-3 mt-6">
+                            <label for="nama" class="col-sm-2 col-form-label required-field">Role Name</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control @error('nama') is-invalid @enderror" id="nama" name="nama" value="{{ old('nama', $role->name ?? '') }}" placeholder="Enter Role Name" autocomplete="nama">
+                                <input type="text" class="form-control @error('nama') is-invalid @enderror" id="nama" name="nama" value="{{ old('nama', $role->name ?? '') }}" placeholder="Enter Role Name" autocomplete="nama" required>
                                 @error('nama')
                                 <span class="text-danger">{{ $message}}</span>
                                 @enderror
@@ -60,20 +60,46 @@
                         </div>
                         <div class="row mb-3">
                             <label for="nama" class="col-sm-2 col-form-label">Have Permissions</label>
-                            <div class="col-sm-10 px-3" style="display: grid; gap: 5px; grid-template-columns: repeat(3, minmax(0, 1fr));">
-                                @foreach ( $permissions as $item)
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="{{ $item->id }}" name="permissions[]" {{ $role->permissions->contains($item->id)?'checked':'' }}>
-                                    <label class="form-check-label" for="flexCheckDefault">{{ $item->name }}</label>
+                            <div class="col-sm-10 pt-3">
+                                @foreach ($modulFeature as $module)
+                                <div class="pb-3">
+                                    <h3 class="font-semibold pb-1">{{ $module['module_name'] }} - module</h3>
+                                    <div class="border w-full py-2">
+                                        @foreach ($module['data'] ??[] as $key => $feature)
+                                        <div class="mx-3 border-b pt-2 pb-1">
+                                            <span class="font-semibold">{{ $feature['feature_name'] }}</span>
+                                            <input class="form-check-input ml-2 feature-toggle" type="checkbox" value="feat-{{ $feature['feature_name'] }}">
+                                        </div>
+                                        <div class="col-sm-10 ml-3 pt-2 px-3" style="display: grid; gap: 5px; grid-template-columns: repeat(3, minmax(0, 1fr));">
+                                            @foreach ($feature['permissions'] ??[] as $permission)
+                                            <div class="form-check">
+                                                <input class="form-check-input feat-{{ $feature['feature_name'] }}" type="checkbox" value="{{ $permission['permission']['id'] }}" name="permissions[]" {{ $role?->permissions?->contains($permission['permission']['id'])?'checked':'' }}>
+                                                <label class="form-check-label" for="flexCheckDefault">{{ $permission['permission']['name']  }}</label>
+                                            </div>
+                                            @endforeach
+                                        </div>
+                                        @endforeach
+                                    </div>
                                 </div>
                                 @endforeach
+                                <div class="">
+                                    <h3 class="font-semibold pb-1">Other</h3>
+                                    <div class="col-sm-10 border w-full py-3 px-3" style="display: grid; gap: 5px; grid-template-columns: repeat(3, minmax(0, 1fr));">
+                                        @foreach ($other ??[] as $key => $permissions)
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="{{ $permissions->id }}" name="permissions[]" {{ $role?->permissions?->contains($permissions->id)?'checked':'' }}>
+                                            <label class="form-check-label" for="flexCheckDefault">{{ $permissions->name  }}</label>
+                                        </div>
+                                        @endforeach
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="row">
                             <label class="col-sm-2 col-form-label"></label>
                             <div class="col-sm-10">
                                 <br>
-                                <button type="submit" class="btn btn-primary px-5">{{ ($role ? 'Update':'Create') }}</button>
+                                <button type="submit" class="btn btn-primary text-light-blue-900 px-5">{{ ($role ? 'Update':'Create') }}</button>
                             </div>
                         </div>
                     </div>
@@ -89,7 +115,11 @@
 <script>
     $(document).ready(function() {
 
-
+        $('.feature-toggle').change(function() {
+            dat = $(this).val();
+            chk = $(this).prop('checked');
+            $('.' + dat).prop('checked', chk);
+        });
     });
 </script>
 @endsection

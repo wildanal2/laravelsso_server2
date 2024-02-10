@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 // use Laravel\Sanctum\HasApiTokens;
@@ -13,7 +14,7 @@ use Spatie\Permission\Traits\HasRoles;
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
-    use HasRoles;
+    use HasRoles, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -27,7 +28,7 @@ class User extends Authenticatable
         'is_active',
         'failed_try',
     ];
-    protected $appends = ['status','permission'];
+    protected $appends = ['status', 'permission'];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -66,6 +67,11 @@ class User extends Authenticatable
             'text' => 'Rejected',
             'className' => 'bg-danger',
         ];
+        $data[-2] = [
+            'id' => -2,
+            'text' => 'Deleted',
+            'className' => 'bg-danger',
+        ];
         return $data[$this->is_active];
     }
 
@@ -78,6 +84,18 @@ class User extends Authenticatable
             'id', // Foreign key pada model User
             'id', // Local key pada model User
             'entity_id' // Local key pada tabel perantara (SsoUserHasEntity)
+        );
+    }
+
+    public function hasModule()
+    {
+        return $this->hasManyThrough(
+            SsoModule::class,
+            SsoUserHasModule::class,
+            'user_id', // Foreign key pada tabel perantara (SsoUserHasModule)
+            'id', // Foreign key pada model User
+            'id', // Local key pada model User
+            'module_id' // Local key pada tabel perantara (SsoUserHasModule)
         );
     }
 

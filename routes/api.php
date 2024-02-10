@@ -14,13 +14,10 @@ use Illuminate\Support\Facades\Route;
 | routes are loaded by the RouteServiceProvider and all of them will
 | be assigned to the "api" middleware group. Make something great!
 |
-*/
+*/ 
 
-// Route::middleware(['auth:api', 'scope:view-user'])->get('/user', function (Request $request) {
-//     return $request->user();
-// });
 Route::middleware(['auth:api'])->get('/user-detail', function (Request $request) {
-    $query = User::with(['hasEntities', 'permissions', 'roles'])->findOrFail($request->user()->id);
+    $query = User::with(['hasEntities', 'hasModule', 'permissions', 'roles'])->findOrFail($request->user()->id);
 
     return $query->toArray();
 });

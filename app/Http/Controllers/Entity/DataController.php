@@ -8,6 +8,7 @@ use App\Models\SsoEntity;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Laravel\Passport\ClientRepository;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -17,7 +18,7 @@ class DataController extends Controller
     public function get()
     {
         $query = SsoEntity::all();
-        // dd($query);
+        
         return DataTables::of($query)
             ->addColumn('secret', function ($eloquent) {
                 return '**********';
@@ -25,14 +26,6 @@ class DataController extends Controller
             ->addColumn('buttons', function ($eloquent) {
                 $array = [];
                 $user = auth()->user();
-                // if ($user->hasPermissionTo('edit-user')) {
-                //     $array[] = [
-                //         'url' => url('users/' . $eloquent->id . '/edit'),
-                //         'className' => 'btn-success',
-                //         'text' => 'Edit',
-                //         'fontawesome' => 'fa-user-cog',
-                //     ];
-                // } 
                 $array[] = [
                     'url' => url('entity/' . $eloquent->id . '/detail'),
                     'className' => 'btn-outline-secondary',
@@ -45,6 +38,24 @@ class DataController extends Controller
                     'text' => 'Edit',
                     'fontawesome' => 'lni lni-cogs',
                 ];
+                if ($user->hasPermissionTo('sso.manage-entity')) {
+                    $array[] = [
+                        'url' => 'javascript:void(0)',
+                        'className' => 'btn-outline-secondary btn-entity-destroy',
+                        'text' => 'Delete',
+                        'fontawesome' => 'lni lni-trash',
+                        'attribute' => [
+                            [
+                                'name' => 'data-id',
+                                'text' => $eloquent->id,
+                            ],
+                            [
+                                'name' => 'data-name',
+                                'text' => $eloquent->name,
+                            ],
+                        ],
+                    ];
+                }
                 return $array;
             })
             ->make(true);
@@ -52,13 +63,13 @@ class DataController extends Controller
 
     public function submit($entity_id = null)
     {
-        $except='';
+        $except = '';
         try {
             if ($entity_id != null) {
                 $entity = SsoEntity::find($entity_id);
                 $except = $entity_id ? ',' . $entity_id : '';
             }
-            
+
             // validate
             request()->validate([
                 'company_reg' => 'required|string|max:255|unique:sso_entities,company_reg' . $except,
@@ -89,6 +100,26 @@ class DataController extends Controller
 
             DB::connection('mysql')->commit();
             Log::info(json_encode(["message" => $message, "auth_user" => Auth()->user()->toArray(), "data" => $data]));
+            return $this->responseRedirect('entity', $message, 200);
+        } catch (\Exception $e) {
+            DB::connection('mysql')->rollback();
+            Log::info(json_encode(["message" => $e, "auth_user" => Auth()->user()->toArray()]));
+            return $this->error_handler($e);
+        }
+    }
+
+    public function destroy($id = null)
+    {
+        try {
+            DB::connection('mysql')->beginTransaction();
+            // validate  
+            $entity = SsoEntity::findOrFail($id); 
+
+            $entity->delete();
+            $message = 'Successfully Delete Entity';
+
+            DB::connection('mysql')->commit();
+            Log::info(json_encode(["message" => $message, "auth_user" => Auth()->user()->toArray(), "data" => $entity]));
             return $this->responseRedirect('entity', $message, 200);
         } catch (\Exception $e) {
             DB::connection('mysql')->rollback();

@@ -3,7 +3,13 @@
 
 @section('head')
 <link href="{{ url('') }}/assets/theme/plugins/datatable/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
-
+<style>
+    .pemission-td {
+        max-width: 400px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+</style>
 @endsection
 
 @section('content')
@@ -75,12 +81,75 @@
     </div>
 </div>
 
+<!-- Modal -->
+<div class="modal fade" id="logModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Permission Detail</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="logModalBody">
+                <!-- Teks log akan ditampilkan di sini -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary text-gray-600" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @section('script')
 <script src="{{ url('') }}/assets/theme/plugins/datatable/js/jquery.dataTables.min.js"></script>
 <script src="{{ url('') }}/assets/theme/plugins/datatable/js/dataTables.bootstrap5.min.js"></script>
 <script>
+    function destroyRole(id, name) {
+        Swal.fire({
+            title: 'Are you sure to Delete Role?',
+            text: 'You will Role `' + name + '`',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: "#DC3741",
+            confirmButtonText: 'Delete Role',
+            cancelButtonText: 'cancel',
+            reverseButtons: true
+        }).then((result) => {
+            var requestData = {};
+            if (result.isConfirmed) {
+                $.ajax({
+                    type: 'DELETE',
+                    url: "{{ url('') }}/roles/" + id,
+                    dataType: 'json',
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        Swal.fire("Saved!", "" + response?.message, "success").then(() => {
+                            location.reload();
+                        });
+                        Lobibox.notify("success", {
+                            pauseDelayOnHover: true,
+                            continueDelayOnInactiveTab: false,
+                            position: 'top right',
+                            msg: "" + response?.message
+                        });
+                    },
+                    error: function(error) {
+                        console.error(error);
+                        Lobibox.notify("error", {
+                            pauseDelayOnHover: true,
+                            continueDelayOnInactiveTab: false,
+                            position: 'top right',
+                            msg: "Something Wrong! please try Again"
+                        });
+                    }
+                });
+            }
+
+        });
+    }
+
     $(document).ready(function() {
         var main_table = $('#main-table').DataTable({
             aLengthMenu: [
@@ -116,6 +185,13 @@
                 title: 'Permission',
                 data: 'permission',
                 width: '35%',
+                className: 'relative',
+                render: ((data) => {
+                    return `<div class="pemission-td"><p>` + data + `</p>
+                    <button class="absolute inset-y-2 right-1 expand middle none center h-8 max-h-[32px] w-8 max-w-[32px] rounded-lg bg-light-blue-500 font-sans text-xs font-bold uppercase text-white shadow-md shadow-light-blue-500/20 transition-all hover:shadow-lg hover:shadow-light-blue-500/40 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none" data-ripple-light="true" onClick="showMod('` + data + `')">
+                        <i class="lni lni-keyword-research text-xs leading-none"></i>
+                    </button></div>`;
+                })
             }, {
                 title: 'Aksi',
                 data: 'id',
@@ -138,9 +214,29 @@
             }],
             "fnDrawCallback": function() {
                 $('[data-toggle="tooltip"]').tooltip();
+                $('.btn-roles-destroy').on('click', function() {
+                    var id = $(this).data('id');
+                    var name = $(this).data('name');
+                    destroyRole(id, name);
+                });
             }
         });
 
     });
+
+    function showMod(data) {
+        var permissionsArray = data.split(',').map(function(permission) {
+            return permission.trim();
+        });
+        // Buat teks dengan new line
+        var text = permissionsArray.map(function(permission) {
+            return permission + ' (' + permission.split('.')[1].replace('-', ' ') + ')';
+        }).join('\n');
+
+        $('#logModalBody').html('');
+        $('#logModalBody').append('<pre><code>' + (text) + '</code></pre>');
+
+        $('#logModal').modal('show');
+    };
 </script>
 @endsection
